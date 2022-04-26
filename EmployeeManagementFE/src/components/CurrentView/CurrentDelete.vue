@@ -1,10 +1,10 @@
 <template>
-    <div class="backdrop" @click.self="closeDelete">
+    <div class="backdrop" @click.self="close">
         <div class="delete">
-            <button @click="closeDelete">X</button>
+            <button @click="close">X</button>
             <h4>Do you want to archive {{ firstName }} {{ lastName }}?</h4>
-            <button @click="archiveEmloyee(); reloadPage()">Archive And Delete</button>
-            <button @click="deleteEmployee(); reloadPage()">Only Delete</button>
+            <button @click="archiveEmloyee(); close()">Archive And Delete</button>
+            <button @click="deleteEmployee(); close()">Only Delete</button>
         </div>
     </div>
 </template>
@@ -13,7 +13,7 @@
 import axios from 'axios'
 
 export default {
-    props: ['id', 'firstName', 'lastName', 'address', 'dateOfBirth', 'positionName', 'startingDate', 'salary' ],
+    props: ['id', 'firstName', 'lastName', 'address', 'dateOfBirth', 'positionName', 'startingDate', 'salary', 'getEmployeesParent'],
     data() {
         return {
             employeeData: {
@@ -32,22 +32,20 @@ export default {
     methods: {
         // Custom event. Parent component listens to event named "closeDelete".
         // $emit('nameOfEvent')
-        closeDelete() {
+        close() {
             this.$emit('closeDelete');
         },
         deleteEmployee() {
             axios.delete('http://localhost:1028/api/employees/' + this.id)
                 .then(response => console.log(response))
+                .then(() => this.getEmployeesParent())
                 .catch(error => console.log(error))
-        },
-        reloadPage() {
-            window.location.reload();
         },
         archiveEmloyee() {
             axios.post('http://localhost:1028/api/employeesHistory/', this.employeeData)
                 .then(response => console.log(response))
+                .then(() => this.deleteEmployee())
                 .catch(error => console.log(error))
-            this.deleteEmployee();
         }
     }
 }

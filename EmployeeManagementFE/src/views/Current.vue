@@ -1,7 +1,8 @@
 <template>
   <div>
     <div v-if="componentName == 'componentCreate'">
-      <CurrentCreate @closeCreate="componentName = ''"/>
+      <CurrentCreate @closeCreate="componentName = ''"
+      :getEmployeesParent="this.getEmployees"/>
     </div>
     <div v-if="componentName == 'componentDetails'">
       <CurrentDetails @closeDetails="componentName = ''"
@@ -22,7 +23,8 @@
       :dateOfBirth="this.employeeDateOfBirth"
       :positionName="this.employeePosition"
       :startingDate="this.employeeStartingDate"
-      :salary="this.employeeSalary"/>
+      :salary="this.employeeSalary"
+      :getEmployeesParent="this.getEmployees"/>
     </div>
     <div v-if="componentName == 'componentDelete'">
       <CurrentDelete @closeDelete="componentName = ''"
@@ -33,7 +35,8 @@
       :dateOfBirth="this.employeeDateOfBirth"
       :positionName="this.employeePosition"
       :startingDate="this.employeeStartingDate"
-      :salary="this.employeeSalary"/>
+      :salary="this.employeeSalary"
+      :getEmployeesParent="this.getEmployees"/>
     </div>
     <h1>Current Employees</h1>
     <button @click="showCreateComponent('componentCreate')">Create</button>
@@ -67,6 +70,7 @@ import CurrentCreate from '../components/CurrentView/CurrentCreate.vue'
 import CurrentDetails from '../components/CurrentView/CurrentDetails.vue'
 import CurrentEdit from '../components/CurrentView/CurrentEdit.vue'
 import CurrentDelete from '../components/CurrentView/CurrentDelete.vue'
+import axios from 'axios'
 
 export default {
   name: 'CurrentView',
@@ -90,14 +94,18 @@ export default {
       employeeStartingDate: "",
       employeeSalary: "",
       componentName: ""
-    }
+      }
   },
   mounted() {
-    fetch('http://localhost:1028/api/employees')
-      .then(response => response.json())
-      .then(data => {this.employees = data})
+    this.getEmployees();
   },
   methods: {
+    getEmployees() {
+      this.employees = [];
+      axios.get('http://localhost:1028/api/employees')
+        .then(response => {this.employees = response.data;
+                          console.log(response)})
+    },
     passValues(emp) {
       this.employeeId = emp.id;
       this.employeeFirstName = emp.firstName;

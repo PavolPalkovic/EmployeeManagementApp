@@ -1,7 +1,7 @@
 <template>
-    <div class="backdrop" @click.self="closeDetails">
+    <div class="backdrop" @click.self="close">
         <div class="details">
-            <button @click="closeDetails">X</button>
+            <button @click="close">X</button>
             <h4>First Name: {{ firstName }}</h4>
             <h4>Last Name: {{ lastName }}</h4>
             <h4>Address: {{ address }}</h4>
@@ -15,11 +15,11 @@
 
 <script>
 export default {
-    props: ['firstName', 'lastName', 'address', 'dateOfBirth', 'positionName', 'startingDate', 'salary' ],
+    props: ['firstName', 'lastName', 'address', 'dateOfBirth', 'positionName', 'startingDate', 'salary'],
     methods: {
         // Custom event. Parent component listens to event named "closeDetails".
         // $emit('nameOfEvent')
-        closeDetails() {
+        close() {
             this.$emit('closeDetails');
         }
     }

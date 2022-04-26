@@ -1,5 +1,5 @@
 <template>
-    <div class="backdrop" @click.self="closeCreate">
+    <div class="backdrop" @click.self="close">
         <div class="create">
             <h4>*FirstName: <input type="text" v-model="employeeData.firstName"> </h4>
             <h4>*LastName: <input type="text" v-model="employeeData.lastName"> </h4>
@@ -16,11 +16,11 @@
                 <input type="date" :min="new Date().toISOString().split('T')[0]" v-model="employeeData.startingDate">
             </h4>
             <h4>*Salary: <input type="number" v-model="employeeData.salary"> €</h4>
-            <button @click="createEmployee(); closeCreate(); reloadPage();"
+            <button @click="createEmployee(); close();"
                     :disabled="!employeeData.firstName || !employeeData.lastName || 
                     !employeeData.dateOfBirth || !employeeData.positionName ||
                     !employeeData.startingDate || !employeeData.salary">Create</button>
-            <button @click="closeCreate">Cancle</button>
+            <button @click="close">Cancle</button>
         </div>
     </div>
 </template>
@@ -29,7 +29,7 @@
 import axios from 'axios'
 
 export default {
-    props: [ ],
+    props: ['getEmployeesParent'],
     data() {
         return {
             employeeData: {
@@ -48,21 +48,19 @@ export default {
         this.getPositionData();
     },
     methods: {
-        closeCreate() {
+        close() {
             this.$emit('closeCreate');
         },
         createEmployee() {
             axios.post('http://localhost:1028/api/employees', this.employeeData)
                 .then(response => console.log(response))
+                .then(() => this.getEmployeesParent())
                 .catch(error => console.log(error))
         },
         getPositionData() {
             fetch('http://localhost:1028/api/positions')
                 .then(response => response.json())
                 .then(data => {this.positionData = data})
-        },
-        reloadPage() {
-            window.location.reload();
         }
     }
 }

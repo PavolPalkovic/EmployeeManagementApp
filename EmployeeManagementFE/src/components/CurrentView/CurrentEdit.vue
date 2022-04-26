@@ -1,5 +1,5 @@
 <template>
-    <div class="backdrop" @click.self="closeEdit">
+    <div class="backdrop" @click.self="close">
         <div class="edit">
             <h4>*FirstName: <input type="text" v-model="employeeData.firstName"> </h4>
             <h4>*LastName: <input type="text" v-model="employeeData.lastName"> </h4>
@@ -16,11 +16,11 @@
                 <input type="date" :min="new Date().toISOString().split('T')[0]" v-model="employeeData.startingDate">
             </h4>
             <h4>*Salary: <input type="number" v-model="employeeData.salary"> €</h4>
-            <button @click="editEmployee(); closeEdit(); reloadPage();"
+            <button @click="editEmployee(); close();"
                     :disabled="!employeeData.firstName || !employeeData.lastName || 
                     !employeeData.dateOfBirth || !employeeData.positionName ||
                     !employeeData.startingDate || !employeeData.salary">Edit</button>
-            <button @click="closeEdit">Cancle</button>
+            <button @click="close">Cancle</button>
         </div>
     </div>
 </template>
@@ -29,7 +29,7 @@
 import axios from 'axios'
 
 export default {
-    props: ['id', 'firstName', 'lastName', 'address', 'dateOfBirth', 'positionName', 'startingDate', 'salary' ],
+    props: ['id', 'firstName', 'lastName', 'address', 'dateOfBirth', 'positionName', 'startingDate', 'salary', 'getEmployeesParent'],
     components: { },
     data() {
         return {
@@ -52,21 +52,19 @@ export default {
     methods: {
         // Custom event. Parent component listens to event named "closeEdit".
         // $emit('nameOfEvent')
-        closeEdit() {
+        close() {
             this.$emit('closeEdit');
         },
         editEmployee() {
             axios.put('http://localhost:1028/api/employees/' + this.id, this.employeeData)
                 .then(response => console.log(response))
+                .then(() => this.getEmployeesParent())
                 .catch(error => console.log(error))
         },
         getPositionData() {
             fetch('http://localhost:1028/api/positions')
                 .then(response => response.json())
                 .then(data => {this.positionData = data})
-        },
-        reloadPage() {
-            window.location.reload();
         },
         currentDateFormating() {
             const current = new Date();
