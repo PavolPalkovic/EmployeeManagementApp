@@ -34,6 +34,7 @@ namespace EmployeeManagementAPI
                 .AddNewtonsoftJson();
 
             var connectionString = @"Server=(localdb)\mssqllocaldb;Database=EmployeeInfoDB;Trusted_Connection=true";
+            // var connectionString = @"Server=172.17.0.2,1433;integrated security=false;User Id=SA;Password=h^3K9\S6;Database=EmployeeInfoDB";
             // Registers EmployeeDbContext
             services.AddDbContext<EmployeeDbContext>(o =>
             {
