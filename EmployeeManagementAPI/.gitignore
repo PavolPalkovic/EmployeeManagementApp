@@ -22,8 +22,8 @@ _UpgradeReport_Files/
 ###############
 # Directories #
 ###############
-EmployeeManagementAPI/bin/
-EmployeeManagementAPI/obj/
+bin
+obj
 ###################
 # Web publish log #
 ###################
