@@ -70,7 +70,6 @@ import CurrentCreate from '../components/CurrentView/CurrentCreate.vue'
 import CurrentDetails from '../components/CurrentView/CurrentDetails.vue'
 import CurrentEdit from '../components/CurrentView/CurrentEdit.vue'
 import CurrentDelete from '../components/CurrentView/CurrentDelete.vue'
-import axios from 'axios'
 
 export default {
   name: 'CurrentView',
@@ -101,10 +100,9 @@ export default {
   },
   methods: {
     getEmployees() {
-      this.employees = [];
-      axios.get('http://localhost:1028/api/employees')
-        .then(response => {this.employees = response.data;
-                          console.log(response)})
+      fetch('http://localhost:1028/api/employees')
+        .then(response => response.json())
+        .then(data => {this.employees = data})
     },
     passValues(emp) {
       this.employeeId = emp.id;

@@ -4,7 +4,8 @@
       <HistoryDelete @closeDelete="componentName = ''"
       :id="this.employeeHistoryId"
       :firstName="this.employeeFirstName"
-      :lastName="this.employeeLastName"/>
+      :lastName="this.employeeLastName"
+      :getEmployeesHistoryParent="this.getEmployeesHistory"/>
     </div>
     <div v-if="componentName == 'componentDetails'">
       <HistoryDetails @closeDetails="componentName = ''"
@@ -65,11 +66,14 @@ export default {
     }
   },
   mounted() {
-    fetch('http://localhost:1028/api/employeesHistory')
-      .then(response => response.json())
-      .then(data => {this.employees = data})
+    this.getEmployeesHistory();
   },
   methods: {
+    getEmployeesHistory() {
+      fetch('http://localhost:1028/api/employeesHistory')
+        .then(response => response.json())
+        .then(data => {this.employees = data})
+    },
     passValues(emp) {
       this.employeeHistoryId = emp.id;
       this.employeeFirstName = emp.firstName;

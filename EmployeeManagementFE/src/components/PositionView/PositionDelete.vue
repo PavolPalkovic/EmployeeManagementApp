@@ -1,9 +1,9 @@
 <template>
-    <div class="backdrop" @click.self="closeDelete">
+    <div class="backdrop" @click.self="close">
         <div class="delete">
             <h4>Do you really want to delete position: {{ name }}</h4>
-            <button @click="deletePosition(); closeDelete(); reloadPage();">Yes</button>
-            <button @click="closeDelete">Cancle</button>
+            <button @click="deletePosition(); close();">Yes</button>
+            <button @click="close">Cancle</button>
         </div>
     </div>
 </template>
@@ -12,18 +12,16 @@
 import axios from 'axios'
 
 export default {
-    props: [ 'id', 'name' ],
+    props: [ 'id', 'name', 'getPositionsParent' ],
     methods: {
-        closeDelete() {
+        close() {
             this.$emit('closeDelete');
         },
         deletePosition() {
             axios.delete('http://localhost:1028/api/positions/' + this.id)
                 .then(response => console.log(response))
+                .then(() => this.getPositionsParent())
                 .catch(error => console.log(error))
-        },
-        reloadPage() {
-            window.location.reload();
         }
     }
 }

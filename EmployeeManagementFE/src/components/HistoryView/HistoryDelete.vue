@@ -1,9 +1,9 @@
 <template>
-    <div class="backdrop" @click.self="closeDelete">
+    <div class="backdrop" @click.self="close">
         <div class="delete">
             <h4>Do you really want to delete employee: {{ firstName }} {{ lastName }}</h4>
-            <button @click="deleteHistoryEmployee(); closeDelete(); reloadPage();">Yes</button>
-            <button @click="closeDelete">Cancle</button>
+            <button @click="deleteHistoryEmployee(); close();">Yes</button>
+            <button @click="close">Cancle</button>
         </div>
     </div>
 </template>
@@ -12,14 +12,15 @@
 import axios from 'axios'
 
 export default {
-    props: [ 'id', 'firstName', 'lastName' ],
+    props: ['id', 'firstName', 'lastName', 'getEmployeesHistoryParent'],
     methods: {
-        closeDelete() {
+        close() {
             this.$emit('closeDelete');
         },
         deleteHistoryEmployee() {
             axios.delete('http://localhost:1028/api/employeesHistory/' + this.id)
                 .then(response => console.log(response))
+                .then(() => this.getEmployeesHistoryParent())
                 .catch(error => console.log(error))
         },
         reloadPage() {

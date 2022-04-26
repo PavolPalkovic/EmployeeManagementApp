@@ -1,13 +1,15 @@
 <template>
   <div>
     <div v-if="componentName == 'componentCreate'">
-      <PositionCreate @closeCreate="componentName = ''"/>
+      <PositionCreate @closeCreate="componentName = ''"
+      :getPositionsParent="this.getPositions"/>
     </div>
     <div v-if="componentName == 'componentDelete'">
       <PositionDelete @closeDelete="componentName = ''"
       :id="this.positionId"
       :name="this.positionName"
-      :description="this.positionDescription"/>
+      :description="this.positionDescription"
+      :getPositionsParent="this.getPositions"/>
     </div>
     <h1>Positions</h1>
     <button @click="showCreateComponent('componentCreate')">Create</button>
@@ -42,10 +44,10 @@ export default {
     }
   },
   mounted() {
-    this.getData()
+    this.getPositions()
   },
   methods: {
-    getData() {
+    getPositions() {
       fetch('http://localhost:1028/api/positions')
         .then(response => response.json())
         .then(data => {this.positions = data})

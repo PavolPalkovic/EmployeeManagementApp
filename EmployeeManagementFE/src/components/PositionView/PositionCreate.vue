@@ -1,10 +1,10 @@
 <template>
-    <div class="backdrop" @click.self="closeCreate">
+    <div class="backdrop" @click.self="close">
         <div class="create">
             <h4>*Name: <input type="text" v-model="positionData.name"> </h4>
             <h4>Description: <input type="text" v-model="positionData.description"> </h4>
-            <button @click="createPosition(); closeCreate(); reloadPage();" :disabled="!positionData.name">Create</button>
-            <button @click="closeCreate">Cancle</button>
+            <button @click="createPosition(); close();" :disabled="!positionData.name">Create</button>
+            <button @click="close">Cancle</button>
         </div>
     </div>
 </template>
@@ -13,7 +13,7 @@
 import axios from 'axios'
 
 export default {
-    props: [ ],
+    props: [ 'getPositionsParent' ],
     data() {
         return {
             positionData: {
@@ -23,16 +23,14 @@ export default {
         }
     },
     methods: {
-        closeCreate() {
+        close() {
             this.$emit('closeCreate');
         },
         createPosition() {
             axios.post('http://localhost:1028/api/positions', this.positionData)
                 .then(response => console.log(response))
+                .then(() => this.getPositionsParent())
                 .catch(error => console.log(error))
-        },
-        reloadPage() {
-            window.location.reload();
         }
     }
 }
