@@ -15,7 +15,7 @@
             <h4>*Starting Date:
                 <input type="date" :min="new Date().toISOString().split('T')[0]" v-model="employeeData.startingDate">
             </h4>
-            <h4>*Salary: <input type="text" v-model="employeeData.salary"> €</h4>
+            <h4>*Salary: <input type="number" v-model="employeeData.salary"> €</h4>
             <button @click="createEmployee(); closeCreate(); reloadPage();"
                     :disabled="!employeeData.firstName || !employeeData.lastName || 
                     !employeeData.dateOfBirth || !employeeData.positionName ||
