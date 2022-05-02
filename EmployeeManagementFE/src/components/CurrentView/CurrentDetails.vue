@@ -6,7 +6,7 @@
             <h4>Last Name: {{ lastName }}</h4>
             <h4>Address: {{ address }}</h4>
             <h4>Date Of Birth: {{ dateOfBirth }}</h4>
-            <h4>Position: {{ positionName }}</h4>
+            <h4>Position: {{ position.name }}</h4>
             <h4>Starting Date: {{ startingDate }}</h4>
             <h4>Salary: {{ salary }} €</h4>
         </div>
@@ -15,7 +15,7 @@
 
 <script>
 export default {
-    props: ['firstName', 'lastName', 'address', 'dateOfBirth', 'positionName', 'startingDate', 'salary'],
+    props: ['firstName', 'lastName', 'address', 'dateOfBirth', 'position', 'startingDate', 'salary'],
     methods: {
         // Custom event. Parent component listens to event named "closeDetails".
         // $emit('nameOfEvent')

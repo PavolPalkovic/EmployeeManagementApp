@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace EmployeeManagementAPI.Models
 {
@@ -8,11 +10,11 @@ namespace EmployeeManagementAPI.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Address { get; set; }
-        public string DateOfBirth { get; set; }
-        public string PositionName { get; set; }
-        public string StartingDate { get; set; }
+        public DateTime DateOfBirth { get; set; }
+        public DateTime StartingDate { get; set; }
         public double Salary { get; set; }
-        //public ICollection<PreviousPosition> PreviousPositions { get; set; }
+        public int PositionId { get; set; }
+        public PositionDto Position { get; set; }
     }
 }
 

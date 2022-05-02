@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -23,16 +24,18 @@ namespace EmployeeManagementAPI.Entities
         public string Address { get; set; }
 
         [Required]
-        public string DateOfBirth { get; set; }
-
-        [Required]
-        [MaxLength(20)]
-        public string PositionName { get; set; }
+        public DateTime DateOfBirth { get; set; }
         
         [Required]
-        public string StartingDate { get; set; }
+        public DateTime StartingDate { get; set; }
 
         [Required]
         public double Salary { get; set; }
+
+        // Navigation Property
+        // Employee has position
+        [ForeignKey("Position")]
+        public int PositionId { get; set; }
+        public Position Position { get; set; }
     }
 }

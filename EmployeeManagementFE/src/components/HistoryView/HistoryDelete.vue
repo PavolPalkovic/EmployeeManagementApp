@@ -22,9 +22,6 @@ export default {
                 .then(response => console.log(response))
                 .then(() => this.getEmployeesHistoryParent())
                 .catch(error => console.log(error))
-        },
-        reloadPage() {
-            window.location.reload();
         }
     }
 }

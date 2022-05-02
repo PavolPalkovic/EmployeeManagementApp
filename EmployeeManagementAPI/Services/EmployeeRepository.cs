@@ -20,11 +20,11 @@ namespace EmployeeManagementAPI.Services
 
         public IEnumerable<Employee> GetEmployees()
         {
-            return _context.Employees.ToList();
+            return _context.Employees.Include(e => e.Position).ToList();
         }
         public Employee GetEmployee(int employeeId)
         {   
-            return _context.Employees.Where(e => e.Id == employeeId).FirstOrDefault();
+            return _context.Employees.Include(e => e.Position).FirstOrDefault(e => e.Id == employeeId);
         }
         public void CreateEmployee(Employee employee)
         {

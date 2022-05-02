@@ -25,6 +25,7 @@ namespace EmployeeManagementAPI
                 try
                 {
                     var context = scope.ServiceProvider.GetService<EmployeeDbContext>();
+                    //context.Database.EnsureDeleted();
                     // Creates DB if does not exist
                     context.Database.Migrate();
                 }

@@ -8,8 +8,9 @@
                 <input type="date" :max="new Date().toISOString().split('T')[0]" v-model="employeeData.dateOfBirth">
             </h4>
             <h4>*Position:
-            <select v-model="employeeData.positionName" >
-                <option v-for="position in positionData" :key="position.id">{{ position.name }}</option>
+            <select @change="changePositionId($event)" >
+                <option disabled selected value> -- select an option -- </option>
+                <option v-for="position in positionData" :key="position.id" :value="position.id">{{ position.name }}</option>
             </select>
             </h4>
             <h4>*Starting Date:
@@ -18,7 +19,7 @@
             <h4>*Salary: <input type="number" v-model="employeeData.salary"> €</h4>
             <button @click="createEmployee(); close();"
                     :disabled="!employeeData.firstName || !employeeData.lastName || 
-                    !employeeData.dateOfBirth || !employeeData.positionName ||
+                    !employeeData.dateOfBirth || !employeeData.positionId ||
                     !employeeData.startingDate || !employeeData.salary">Create</button>
             <button @click="close">Cancle</button>
         </div>
@@ -37,7 +38,7 @@ export default {
                 lastName: '',
                 address: '',
                 dateOfBirth: '',
-                positionName: '',
+                positionId: null,
                 startingDate: '',
                 salary: ''
             },
@@ -52,6 +53,8 @@ export default {
             this.$emit('closeCreate');
         },
         createEmployee() {
+            this.changeDateFormat();
+            console.log(this.employeeData.positionId);
             axios.post('http://localhost:1028/api/employees', this.employeeData)
                 .then(response => console.log(response))
                 .then(() => this.getEmployeesParent())
@@ -61,6 +64,13 @@ export default {
             fetch('http://localhost:1028/api/positions')
                 .then(response => response.json())
                 .then(data => {this.positionData = data})
+        },
+        changeDateFormat() {
+            this.employeeData.dateOfBirth += "T00:00:00";
+            this.employeeData.startingDate += "T00:00:00";
+        },
+        changePositionId(e) {
+            this.employeeData.positionId = e.target.value;
         }
     }
 }

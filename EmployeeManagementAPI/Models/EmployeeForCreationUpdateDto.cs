@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace EmployeeManagementAPI.Models
@@ -16,14 +17,13 @@ namespace EmployeeManagementAPI.Models
         public string Address { get; set; }
 
         [Required(ErrorMessage = "You should provide a DateOfBirth value.")]
-        public string DateOfBirth { get; set; }
+        public DateTime DateOfBirth { get; set; }
 
-        [Required(ErrorMessage = "You should provide a PositionName value.")]
-        [MaxLength(20)]
-        public string PositionName { get; set; }
+        [Required(ErrorMessage = "You should provide a PositionId value.")]
+        public int PositionId { get; set; }
 
         [Required(ErrorMessage = "You should provide a StartingDate value.")]
-        public string StartingDate { get; set; }
+        public DateTime StartingDate { get; set; }
 
         [Required(ErrorMessage = "You should provide a Salary value.")]
         public double Salary { get; set; }

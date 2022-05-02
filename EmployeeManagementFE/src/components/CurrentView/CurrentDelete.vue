@@ -13,7 +13,7 @@
 import axios from 'axios'
 
 export default {
-    props: ['id', 'firstName', 'lastName', 'address', 'dateOfBirth', 'positionName', 'startingDate', 'salary', 'getEmployeesParent'],
+    props: ['id', 'firstName', 'lastName', 'address', 'dateOfBirth', 'positionId', 'position', 'startingDate', 'salary', 'getEmployeesParent'],
     data() {
         return {
             employeeData: {
@@ -22,10 +22,11 @@ export default {
                 lastName: this.lastName,
                 address: this.address,
                 dateOfBirth: this.dateOfBirth,
-                positionName: this.positionName,
+                positionId: this.positionId,
+                position: this.position,
                 startingDate: this.startingDate,
                 salary: this.salary,
-                dateOfDeletion: new Date().toISOString().split('T')[0]
+                dateOfDeletion: new Date().toISOString()
             }
         }
     },
@@ -41,11 +42,16 @@ export default {
                 .then(() => this.getEmployeesParent())
                 .catch(error => console.log(error))
         },
-        archiveEmloyee() {
+        archiveEmloyee(dateOfDeletion) {
+            this.changeDateFormat();
             axios.post('http://localhost:1028/api/employeesHistory/', this.employeeData)
                 .then(response => console.log(response))
                 .then(() => this.deleteEmployee())
                 .catch(error => console.log(error))
+        },
+        changeDateFormat() {
+            this.employeeData.dateOfBirth += "T00:00:00";
+            this.employeeData.startingDate += "T00:00:00";
         }
     }
 }

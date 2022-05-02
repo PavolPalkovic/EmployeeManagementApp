@@ -13,7 +13,7 @@
       :lastName="this.employeeLastName"
       :address="this.employeeAdress"
       :dateOfBirth="this.employeeDateOfBirth"
-      :positionName="this.employeePosition"
+      :positionName="this.employeePosition.name"
       :startingDate="this.employeeStartingDate"
       :salary="this.employeeSalary"/>
     </div>
@@ -31,8 +31,8 @@
         <tbody>
           <tr v-for="employee in employees" :key="employee.id">
             <td class="underline-on-hover" @click="showComponent(employee, 'componentDetails')">{{ employee.firstName }} {{ employee.lastName }}</td>
-            <td>{{ employee.positionName }}</td>
-            <td>{{ employee.dateOfDeletion }}</td>
+            <td>{{ employee.position.name }}</td>
+            <td>{{ employee.dateOfDeletion.split('T')[0] }}</td>
             <td>
               <button @click="showComponent(employee, 'componentDelete')">Delete</button>
             </td>
@@ -59,7 +59,8 @@ export default {
       employeeLastName: "",
       employeeAdress: "",
       employeeDateOfBirth: "",
-      employeePosition: "",
+      employeePositionId: 0,
+      employeePosition: {},
       employeeStartingDate: "",
       employeeSalary: "",
       componentName: ""
@@ -79,9 +80,10 @@ export default {
       this.employeeFirstName = emp.firstName;
       this.employeeLastName = emp.lastName;
       this.employeeAdress = emp.address;
-      this.employeeDateOfBirth = emp.dateOfBirth;
-      this.employeePosition = emp.positionName;
-      this.employeeStartingDate = emp.startingDate;
+      this.employeeDateOfBirth = emp.dateOfBirth.split('T')[0];
+      this.employeePositionId = emp.positionId;
+      this.employeePosition = emp.position;
+      this.employeeStartingDate = emp.startingDate.split('T')[0];
       this.employeeSalary = emp.salary;
     },
     showComponent(emp, componentName) {

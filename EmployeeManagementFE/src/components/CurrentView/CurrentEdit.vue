@@ -8,17 +8,17 @@
                 <input type="date" :max="new Date().toISOString().split('T')[0]" v-model="employeeData.dateOfBirth">
             </h4>
             <h4>*Position:
-            <select v-model="employeeData.positionName" >
-                <option v-for="position in positionData" :key="position.id">{{ position.name }}</option>
+            <select @change="changePositionId($event)">
+                <option v-for="position in positionData" :key="position.id" :selected="employeeData.positionId == position.id" :value="position.id">{{ position.name }}</option>
             </select>
             </h4>
             <h4>*Starting Date:
                 <input type="date" :min="new Date().toISOString().split('T')[0]" v-model="employeeData.startingDate">
             </h4>
             <h4>*Salary: <input type="number" v-model="employeeData.salary"> €</h4>
-            <button @click="editEmployee(); close();"
+            <button @click="editEmployee(this.id, this.employeeData).then(() => this.getEmployeesParent()); close();"
                     :disabled="!employeeData.firstName || !employeeData.lastName || 
-                    !employeeData.dateOfBirth || !employeeData.positionName ||
+                    !employeeData.dateOfBirth || !employeeData.position.name ||
                     !employeeData.startingDate || !employeeData.salary">Edit</button>
             <button @click="close">Cancle</button>
         </div>
@@ -27,9 +27,10 @@
 
 <script>
 import axios from 'axios'
+import { editEmployee } from '../../composables/requests'
 
 export default {
-    props: ['id', 'firstName', 'lastName', 'address', 'dateOfBirth', 'positionName', 'startingDate', 'salary', 'getEmployeesParent'],
+    props: ['id', 'firstName', 'lastName', 'address', 'dateOfBirth', 'positionId', 'position', 'startingDate', 'salary', 'getEmployeesParent'],
     components: { },
     data() {
         return {
@@ -38,38 +39,31 @@ export default {
                 lastName: this.lastName,
                 address: this.address,
                 dateOfBirth: this.dateOfBirth,
-                positionName: this.positionName,
+                positionId: this.positionId,
+                position: this.position,
                 startingDate: this.startingDate,
                 salary: this.salary
             },
             positionData: [],
-            currentDate: ''
         }
     },
     mounted() {
         this.getPositionData();
     },
     methods: {
+        editEmployee,
         // Custom event. Parent component listens to event named "closeEdit".
         // $emit('nameOfEvent')
         close() {
             this.$emit('closeEdit');
         },
-        editEmployee() {
-            axios.put('http://localhost:1028/api/employees/' + this.id, this.employeeData)
-                .then(response => console.log(response))
-                .then(() => this.getEmployeesParent())
-                .catch(error => console.log(error))
-        },
         getPositionData() {
             fetch('http://localhost:1028/api/positions')
                 .then(response => response.json())
-                .then(data => {this.positionData = data})
+                .then(data =>{this.positionData = data})
         },
-        currentDateFormating() {
-            const current = new Date();
-            const currentDate = current.getFullYear()+'-'+(current.getMonth()+1)+'-'+current.getDate();
-            return currentDate;
+        changePositionId(e) {
+            this.employeeData.positionId = e.target.value;
         }
     }
 }

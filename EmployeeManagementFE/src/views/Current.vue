@@ -10,7 +10,7 @@
       :lastName="this.employeeLastName"
       :address="this.employeeAdress"
       :dateOfBirth="this.employeeDateOfBirth"
-      :positionName="this.employeePosition"
+      :position="this.employeePosition"
       :startingDate="this.employeeStartingDate"
       :salary="this.employeeSalary"/>
     </div>
@@ -21,7 +21,8 @@
       :lastName="this.employeeLastName"
       :address="this.employeeAdress"
       :dateOfBirth="this.employeeDateOfBirth"
-      :positionName="this.employeePosition"
+      :positionId="this.employeePositionId"
+      :position="this.employeePosition"
       :startingDate="this.employeeStartingDate"
       :salary="this.employeeSalary"
       :getEmployeesParent="this.getEmployees"/>
@@ -33,7 +34,8 @@
       :lastName="this.employeeLastName"
       :address="this.employeeAdress"
       :dateOfBirth="this.employeeDateOfBirth"
-      :positionName="this.employeePosition"
+      :positionId="this.employeePositionId"
+      :position="this.employeePosition"
       :startingDate="this.employeeStartingDate"
       :salary="this.employeeSalary"
       :getEmployeesParent="this.getEmployees"/>
@@ -52,7 +54,7 @@
         <tbody>
           <tr v-for="employee in employees" :key="employee.id">
             <td class="underline-on-hover" @click="showComponent(employee, 'componentDetails')">{{ employee.firstName }} {{ employee.lastName }}</td>
-            <td>{{ employee.positionName }}</td>
+            <td>{{ employee.position.name }}</td>
             <td>
               <button @click="showComponent(employee, 'componentEdit')">Edit</button>
               <button @click="showComponent(employee, 'componentDelete')">Delete</button>
@@ -70,6 +72,7 @@ import CurrentCreate from '../components/CurrentView/CurrentCreate.vue'
 import CurrentDetails from '../components/CurrentView/CurrentDetails.vue'
 import CurrentEdit from '../components/CurrentView/CurrentEdit.vue'
 import CurrentDelete from '../components/CurrentView/CurrentDelete.vue'
+import { getEmployees } from '../composables/requests'
 
 export default {
   name: 'CurrentView',
@@ -79,39 +82,35 @@ export default {
   },
   data() {
     return {
-      employees: [
-        // { id: "1", firstName: "Aaa", lastName: "Bbb", position: "cook" },
-        // { id: "2", firstName: "Mmm", lastName: "Nnn", position: "cook" },
-        // { id: "3", firstName: "Yyy", lastName: "Zzz", position: "waiter" }
-      ],
+      employees: [],
       employeeId: 0,
       employeeFirstName: "",
       employeeLastName: "",
       employeeAdress: "",
       employeeDateOfBirth: "",
-      employeePosition: "",
+      employeePositionId: 0,
+      employeePosition: {},
       employeeStartingDate: "",
       employeeSalary: "",
       componentName: ""
       }
   },
   mounted() {
-    this.getEmployees();
+    this.getEmployees()
   },
   methods: {
     getEmployees() {
-      fetch('http://localhost:1028/api/employees')
-        .then(response => response.json())
-        .then(data => {this.employees = data})
+      getEmployees().then(data => this.employees = data)
     },
     passValues(emp) {
       this.employeeId = emp.id;
       this.employeeFirstName = emp.firstName;
       this.employeeLastName = emp.lastName;
       this.employeeAdress = emp.address;
-      this.employeeDateOfBirth = emp.dateOfBirth;
-      this.employeePosition = emp.positionName;
-      this.employeeStartingDate = emp.startingDate;
+      this.employeeDateOfBirth = emp.dateOfBirth.split('T')[0];
+      this.employeePositionId = emp.positionId;
+      this.employeePosition = emp.position;
+      this.employeeStartingDate = emp.startingDate.split('T')[0];
       this.employeeSalary = emp.salary;
     },
     showComponent(emp, componentName) {
