@@ -24,6 +24,9 @@ _UpgradeReport_Files/
 ###############
 bin
 obj
+Migrations
+#But not the Snapshot in Migrations
+!Migrations/EmployeeDbContextModelSnapshot.cs
 ###################
 # Web publish log #
 ###################
