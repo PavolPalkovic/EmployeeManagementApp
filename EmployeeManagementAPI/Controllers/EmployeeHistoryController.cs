@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using AutoMapper;
 using EmployeeManagementAPI.Models;
 using EmployeeManagementAPI.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeManagementAPI.Controllers
@@ -21,45 +23,81 @@ namespace EmployeeManagementAPI.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetEmployeesHistory()
-        {
-            var employeeHistoryEntities = _employeeHistoryRepository.GetEmployeesHistory();
-
-            return Ok(_mapper.Map<IEnumerable<EmployeeHistoryDto>>(employeeHistoryEntities));
+        public async Task<IActionResult> GetEmployeesHistory()
+        {   
+            try
+            {   
+                var employeeHistoryEntities = await _employeeHistoryRepository.GetEmployeesHistory();
+                // Returns status code 200 OK along with the list of employeesHistory (Models.EmployeeHistoryDto) in body of response
+                return Ok(_mapper.Map<IEnumerable<Models.EmployeeHistoryDto>>(employeeHistoryEntities));
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database");
+            }
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetEmployeeHistory(int id)
+        public async Task<IActionResult> GetEmployeeHistory(int id)
         {
-            var employee = _employeeHistoryRepository.GetEmployeeHistory(id);
+            try
+            {
+                var employeeHistoryEntity = await _employeeHistoryRepository.GetEmployeeHistory(id);
 
-            if (employee == null)
-                return NotFound();
+                if (employeeHistoryEntity == null)
+                    return NotFound();
 
-            return Ok(_mapper.Map<EmployeeHistoryDto>(employee));
+                return Ok(_mapper.Map<Models.EmployeeHistoryDto>(employeeHistoryEntity));
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database");
+            }
         }
         
         [HttpPost]
-        public IActionResult CreateEmployeeHistory([FromBody] EmployeeHistoryForCreationDto employee)
+        public async Task<IActionResult> CreateEmployeeHistory([FromBody] EmployeeHistoryForCreationDto employee)
         {
-            var finalEmployee = _mapper.Map<Entities.EmployeeHistory>(employee);
+            try
+            {
+                if (employee == null)
+                    return BadRequest();
+                
+                var createdEmployee = _mapper.Map<Entities.EmployeeHistory>(employee); 
+                await _employeeHistoryRepository.CreateEmployeeHistory(createdEmployee);
+                var createdEmployeeToReturn = _mapper.Map<Models.EmployeeHistoryDto>(createdEmployee);
 
-            _employeeHistoryRepository.CreateEmployeeHistory(finalEmployee);
-            _employeeHistoryRepository.Save();
-
-            var employeeHistoryEntities = _employeeHistoryRepository.GetEmployeesHistory();
-            return Ok(_mapper.Map<IEnumerable<EmployeeHistoryDto>>(employeeHistoryEntities));
+                return CreatedAtAction(nameof(GetEmployeeHistory),
+                    new { id = createdEmployeeToReturn.Id }, createdEmployeeToReturn);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error creating new employee record");
+            }
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult DeleteEmployeeHistory(int id)
-        {   
-            var employeeEntity = _employeeHistoryRepository.GetEmployeeHistory(id);
-            _employeeHistoryRepository.DeleteEmployeeHistory(employeeEntity);
-            _employeeHistoryRepository.Save();
 
-            var employeeHistoryEntities = _employeeHistoryRepository.GetEmployeesHistory();
-            return Ok(_mapper.Map<IEnumerable<EmployeeHistoryDto>>(employeeHistoryEntities));
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteEmployeeHistory(int id)
+        {   
+            try
+            {
+                var employeeEntity = await _employeeHistoryRepository.GetEmployeeHistory(id); 
+
+                if (employeeEntity == null)
+                    return NotFound($"EmployeeHistory with Id = {id} not found");
+
+                await _employeeHistoryRepository.DeleteEmployeeHistory(id);
+                return NoContent();
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error deleting data");
+            }
         }
     }
 }

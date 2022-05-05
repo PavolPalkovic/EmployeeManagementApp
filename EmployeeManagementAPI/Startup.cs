@@ -11,11 +11,19 @@ using EmployeeManagementAPI.Context;
 using Microsoft.EntityFrameworkCore;
 using EmployeeManagementAPI.Services;
 using AutoMapper;
+using Microsoft.Extensions.Configuration;
 
 namespace EmployeeManagementAPI
 {
     public class Startup
     {
+        private readonly IConfiguration _configuration;
+
+        public Startup(IConfiguration configuration)
+        {
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -33,14 +41,12 @@ namespace EmployeeManagementAPI
                 .AddControllersWithViews()
                 .AddNewtonsoftJson();
 
-            var connectionString = @"Server=(localdb)\mssqllocaldb;Database=EmployeeInfoDB;Trusted_Connection=true";
-            //var connectionString = @"Server=172.17.0.2,1433;integrated security=false;User Id=SA;Password=h^3K9\S6;Database=EmployeeInfoDB";
+            var connectionString = _configuration["connectionStrings:employeeInfoDBConnectionString"];
+            // "Server=172.17.0.2,1433;integrated security=false;User Id=SA;Password=h^3K9\S6;Database=EmployeeInfoDB";
             // Registers EmployeeDbContext
-            services.AddDbContext<EmployeeDbContext>(o =>
-            {
+            services.AddDbContext<EmployeeDbContext>(options =>
                 // Connects to DB
-                o.UseSqlServer(connectionString);
-            });
+                options.UseSqlServer(connectionString));
 
             // Registration of repository service
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();

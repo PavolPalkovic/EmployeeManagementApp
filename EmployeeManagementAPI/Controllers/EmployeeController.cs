@@ -5,6 +5,8 @@ using EmployeeManagementAPI.Models;
 using EmployeeManagementAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace EmployeeManagementAPI.Controllers
 {
@@ -22,99 +24,103 @@ namespace EmployeeManagementAPI.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetEmployees()
+        public async Task<IActionResult> GetEmployees()
         {
-            var employeeEntities = _employeeRepository.GetEmployees();
-
-            return Ok(_mapper.Map<IEnumerable<EmployeeDto>>(employeeEntities));
-            // Manually Mapping Entities to DTOs
-            // var results = new List<EmployeeDto>();
-           
-            // foreach (var employeeEntity in employeeEntities)
-            // {
-            //     results.Add(new EmployeeDto
-            //     {
-            //         Id = employeeEntity.Id,
-            //         FirstName = employeeEntity.FirstName,
-            //         LastName = employeeEntity.LastName
-            //     });
-            // }
-            // return Ok(results);
+            try
+            {   
+                var employeeEntities = await _employeeRepository.GetEmployees();
+                // Returns status code 200 OK along with the list of employees (Models.EmployeeDto) in body of response
+                return Ok(_mapper.Map<IEnumerable<Models.EmployeeDto>>(employeeEntities));
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database");
+            }
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetEmployee(int id)
+        public async Task<IActionResult> GetEmployee(int id)
         {
-            var employee = _employeeRepository.GetEmployee(id);
+            try
+            {
+                var employeeEntity = await _employeeRepository.GetEmployee(id);
 
-            if (employee == null)
-                return NotFound();
+                if (employeeEntity == null)
+                    return NotFound();
 
-            return Ok(_mapper.Map<EmployeeDto>(employee));
-            // var employeeResult = new EmployeeDto() 
-            // {
-            //     Id = employee.Id,
-            //     FirstName = employee.FirstName,
-            //     LastName = employee.LastName
-            // };
-            // return Ok(employee);
+                return Ok(_mapper.Map<Models.EmployeeDto>(employeeEntity));
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database");
+            }
         }
         
         [HttpPost]
-        public IActionResult CreateEmployee([FromBody] EmployeeForCreationUpdateDto employee)
+        public async Task<IActionResult> CreateEmployee([FromBody] EmployeeForCreationUpdateDto employee)
         {
-            var finalEmployee = _mapper.Map<Entities.Employee>(employee);
+            try
+            {
+                if (employee == null)
+                    return BadRequest();
+                
+                var createdEmployee = _mapper.Map<Entities.Employee>(employee); 
+                await _employeeRepository.CreateEmployee(createdEmployee);
+                var createdEmployeeToReturn = _mapper.Map<Models.EmployeeDto>(createdEmployee);
 
-            _employeeRepository.CreateEmployee(finalEmployee);
-            _employeeRepository.Save();
-
-            var employeeEntities = _employeeRepository.GetEmployees();
-            return Ok(_mapper.Map<IEnumerable<EmployeeDto>>(employeeEntities));
+                return CreatedAtAction(nameof(GetEmployee),
+                    new { id = createdEmployeeToReturn.Id }, createdEmployeeToReturn);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error creating new employee record");
+            }
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteEmployee(int id)
+        public async Task<IActionResult> DeleteEmployee(int id)
         {   
-            var employeeEntity = _employeeRepository.GetEmployee(id);
-            _employeeRepository.DeleteEmployee(employeeEntity);
-            _employeeRepository.Save();
+            try
+            {
+                var employeeEntity = await _employeeRepository.GetEmployee(id); 
 
-            var employeeEntities = _employeeRepository.GetEmployees();
-            return Ok(_mapper.Map<IEnumerable<EmployeeDto>>(employeeEntities));
+                if (employeeEntity == null)
+                    return NotFound($"Employee with Id = {id} not found");
+
+                await _employeeRepository.DeleteEmployee(id);
+                return NoContent();
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error deleting data");
+            }
         }
 
         // [FromBody] - Specifies that the value should be read from the body of the request
         [HttpPut("{id}")]
-        public IActionResult UpdateEmployee(int id, [FromBody] EmployeeForCreationUpdateDto employee)
+        public async Task<IActionResult> UpdateEmployee(int id, [FromBody] EmployeeForCreationUpdateDto employee)
         {
-            var employeeEntity = _employeeRepository.GetEmployee(id);
+            try
+            {   
+                var employeeEntity = await _employeeRepository.GetEmployee(id);
 
-            _mapper.Map(employee, employeeEntity);
-            _employeeRepository.Save();
+                if (employeeEntity == null)
+                    return NotFound($"Employee with Id = {id} not found");
 
-            var employeeEntities = _employeeRepository.GetEmployees();
-            return Ok(_mapper.Map<IEnumerable<EmployeeDto>>(employeeEntities));
+                _mapper.Map(employee, employeeEntity);
+                await _employeeRepository.UpdateEmployee();
+                
+                return Ok(_mapper.Map<Models.EmployeeDto>(employeeEntity));
+            }
+            catch (Exception)
+            {
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                "Error updating data");
+            }
         }
-
-
-        [HttpPatch("{id}")]
-        public IActionResult PartiallyUpdateEmployee(int id, [FromBody] JsonPatchDocument<EmployeeForCreationUpdateDto> patchDoc)
-        {   
-            var employeeEntity = _employeeRepository.GetEmployee(id);
-            var employeeToPatch = _mapper.Map<EmployeeForCreationUpdateDto>(employeeEntity);
-
-            patchDoc.ApplyTo(employeeToPatch);
-
-            _mapper.Map(employeeToPatch, employeeEntity);
-
-            _employeeRepository.UpdateEmployee(employeeEntity);
-            _employeeRepository.Save();
-
-
-            var employeeEntities = _employeeRepository.GetEmployees();
-            return Ok(_mapper.Map<IEnumerable<EmployeeDto>>(employeeEntities));
-        }
-
-
     }
 }

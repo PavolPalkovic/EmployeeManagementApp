@@ -4,6 +4,8 @@ using EmployeeManagementAPI.Services;
 using EmployeeManagementAPI.Context;
 using EmployeeManagementAPI.Entities;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeManagementAPI.Services
 {
@@ -18,25 +20,28 @@ namespace EmployeeManagementAPI.Services
 
 
 
-        public IEnumerable<Position> GetPositions()
+        public async Task<IEnumerable<Position>> GetPositions()
         {
-            return _context.Positions.ToList();
+            return await _context.Positions.ToListAsync();
         }
-        public Position GetPosition(int positionId)
+        public async Task<Position> GetPosition(int positionId)
         {
-            return _context.Positions.Where(p => p.Id == positionId).FirstOrDefault();
+            return await _context.Positions.FirstOrDefaultAsync(p => p.Id == positionId);
         }
-        public void AddPosition(Position position)
+        public async Task CreatePosition(Position position)
         {
-            _context.Positions.Add(position);
+            await _context.Positions.AddAsync(position);
+            await _context.SaveChangesAsync();
         }
-        public void DeletePosition(Position position)
+        public async Task DeletePosition(int positionId)
         {
-            _context.Positions.Remove(position);
-        }
-        public bool Save()
-        {
-            return (_context.SaveChanges() >= 0);
+            var result = await _context.Positions.FirstOrDefaultAsync(p => p.Id == positionId);
+            
+            if (result != null)
+            {
+                _context.Positions.Remove(result);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

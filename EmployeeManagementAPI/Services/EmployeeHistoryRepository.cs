@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using EmployeeManagementAPI.Context;
 using EmployeeManagementAPI.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -18,26 +19,28 @@ namespace EmployeeManagementAPI.Services
 
 
 
-        public IEnumerable<EmployeeHistory> GetEmployeesHistory()
+        public async Task<IEnumerable<EmployeeHistory>> GetEmployeesHistory()
         {
-            return _context.EmployeesHistory.Include(e => e.Position).ToList();
+            return await _context.EmployeesHistory.Include(e => e.Position).ToListAsync();
         }
-        public EmployeeHistory GetEmployeeHistory(int employeeId)
+        public async Task<EmployeeHistory> GetEmployeeHistory(int employeeId)
         {   
-            return _context.EmployeesHistory.Include(e => e.Position).FirstOrDefault();
+            return await _context.EmployeesHistory.Include(e => e.Position).FirstOrDefaultAsync(e => e.Id == employeeId);
         }
-        public void CreateEmployeeHistory(EmployeeHistory employee)
+        public async Task CreateEmployeeHistory(EmployeeHistory employee)
         {
-            _context.EmployeesHistory.Add(employee);
-        }        
-        public void DeleteEmployeeHistory(EmployeeHistory employee)
+            await _context.EmployeesHistory.AddAsync(employee);
+            await _context.SaveChangesAsync();
+        }
+        public async Task DeleteEmployeeHistory(int employeeId)
         {
-            _context.EmployeesHistory.Remove(employee);
+            var result = await _context.EmployeesHistory.FirstOrDefaultAsync(e => e.Id == employeeId);
+            
+            if (result != null)
+            {
+                _context.EmployeesHistory.Remove(result);
+                await _context.SaveChangesAsync();
+            }
         }     
-
-        public bool Save()
-        {
-            return (_context.SaveChanges() >= 0);
-        }
     }
 }
