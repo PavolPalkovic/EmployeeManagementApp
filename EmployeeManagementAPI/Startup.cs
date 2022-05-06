@@ -28,7 +28,7 @@ namespace EmployeeManagementAPI
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {   
-            // Enables sending of requests
+            // Enable sending of requests
             services.AddCors(c => 
                 c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
@@ -36,7 +36,7 @@ namespace EmployeeManagementAPI
 
             var connectionString = _configuration["connectionStrings:employeeInfoDBConnectionString"];
             // "Server=172.17.0.2,1433;integrated security=false;User Id=SA;Password=h^3K9\S6;Database=EmployeeInfoDB";
-            // Registers EmployeeDbContext
+            // Registration of EmployeeDbContext
             services.AddDbContext<EmployeeDbContext>(options =>
                 // Connects to DB
                 options.UseSqlServer(connectionString));
@@ -59,12 +59,12 @@ namespace EmployeeManagementAPI
                 app.UseDeveloperExceptionPage();
             }
 
-            // Matches incoming HTTP requests and dispatches those requests to the app's executable endpoints
+            // Matche incoming HTTP requests and dispatch those requests to the app's executable endpoints
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
             {   
-                // Maps Http requests to controllers
+                // Map Http requests to controllers
                 endpoints.MapControllers();
             });
         }
