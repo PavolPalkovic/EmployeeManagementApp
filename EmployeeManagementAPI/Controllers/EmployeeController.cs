@@ -4,7 +4,6 @@ using AutoMapper;
 using EmployeeManagementAPI.Models;
 using EmployeeManagementAPI.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 

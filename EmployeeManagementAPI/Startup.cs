@@ -30,16 +30,9 @@ namespace EmployeeManagementAPI
         {   
             // Enables sending of requests
             services.AddCors(c => 
-            {
-                c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-            });
+                c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
-            services.AddMvc(options => options.EnableEndpointRouting = false);
-
-            // Enables Json Patch 
-            services
-                .AddControllersWithViews()
-                .AddNewtonsoftJson();
+            services.AddControllers();
 
             var connectionString = _configuration["connectionStrings:employeeInfoDBConnectionString"];
             // "Server=172.17.0.2,1433;integrated security=false;User Id=SA;Password=h^3K9\S6;Database=EmployeeInfoDB";
@@ -66,19 +59,14 @@ namespace EmployeeManagementAPI
                 app.UseDeveloperExceptionPage();
             }
 
-            // Ensures that all requests to the web application are routable to MVC framework,
-            // meaning you can use controller, views and 
-            app.UseMvc();
+            // Matches incoming HTTP requests and dispatches those requests to the app's executable endpoints
+            app.UseRouting();
 
-            // app.UseRouting();
-
-            // app.UseEndpoints(endpoints =>
-            // {
-            //     endpoints.MapGet("/", async context =>
-            //     {
-            //         await context.Response.WriteAsync("Hello World!");
-            //     });
-            // });
+            app.UseEndpoints(endpoints =>
+            {   
+                // Maps Http requests to controllers
+                endpoints.MapControllers();
+            });
         }
     }
 }
