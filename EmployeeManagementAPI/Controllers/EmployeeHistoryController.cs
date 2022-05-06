@@ -46,7 +46,7 @@ namespace EmployeeManagementAPI.Controllers
                 var employeeHistoryEntity = await _employeeHistoryRepository.GetEmployeeHistory(id);
 
                 if (employeeHistoryEntity == null)
-                    return NotFound();
+                    return NotFound($"EmployeeHistory with Id = {id} not found");
 
                 return Ok(_mapper.Map<Models.EmployeeHistoryDto>(employeeHistoryEntity));
             }
@@ -62,9 +62,6 @@ namespace EmployeeManagementAPI.Controllers
         {
             try
             {
-                if (employee == null)
-                    return BadRequest();
-                
                 var createdEmployee = _mapper.Map<Entities.EmployeeHistory>(employee); 
                 await _employeeHistoryRepository.CreateEmployeeHistory(createdEmployee);
                 var createdEmployeeToReturn = _mapper.Map<Models.EmployeeHistoryDto>(createdEmployee);

@@ -47,7 +47,7 @@ namespace EmployeeManagementAPI.Controllers
                 var positionEntity = await _positionRepository.GetPosition(id);
 
                 if (positionEntity == null)
-                    return NotFound();
+                    return NotFound($"Position with Id = {id} not found");
 
                 return Ok(_mapper.Map<Models.PositionDto>(positionEntity));
             }
@@ -64,9 +64,6 @@ namespace EmployeeManagementAPI.Controllers
         {   
             try
             {
-                if (position == null)
-                    return BadRequest();
-
                 // Mapping from PositionForCreationDto to Entities.Position
                 var createdPosition = _mapper.Map<Entities.Position>(position); 
                 await _positionRepository.CreatePosition(createdPosition);

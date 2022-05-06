@@ -46,7 +46,7 @@ namespace EmployeeManagementAPI.Controllers
                 var employeeEntity = await _employeeRepository.GetEmployee(id);
 
                 if (employeeEntity == null)
-                    return NotFound();
+                    return NotFound($"Employee with Id = {id} not found");
 
                 return Ok(_mapper.Map<Models.EmployeeDto>(employeeEntity));
             }
@@ -62,8 +62,12 @@ namespace EmployeeManagementAPI.Controllers
         {
             try
             {
-                if (employee == null)
-                    return BadRequest();
+                if (employee.DateOfBirth > DateTime.Today)
+                    ModelState.AddModelError("DateOfBirth", "DateOfBirth can not be from the future.");
+                if (employee.StartingDate < DateTime.Today)
+                    ModelState.AddModelError("StartingDate", "StartingDate can not be from the past.");
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
                 
                 var createdEmployee = _mapper.Map<Entities.Employee>(employee); 
                 await _employeeRepository.CreateEmployee(createdEmployee);
@@ -105,6 +109,13 @@ namespace EmployeeManagementAPI.Controllers
         {
             try
             {   
+                if (employee.DateOfBirth > DateTime.Today)
+                    ModelState.AddModelError("DateOfBirth", "DateOfBirth can not be from the future.");
+                if (employee.StartingDate < DateTime.Today)
+                    ModelState.AddModelError("StartingDate", "StartingDate can not be from the past.");
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
                 var employeeEntity = await _employeeRepository.GetEmployee(id);
 
                 if (employeeEntity == null)
