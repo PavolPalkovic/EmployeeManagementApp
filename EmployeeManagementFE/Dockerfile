@@ -1,16 +1,21 @@
 FROM node:lts-alpine
 
-# All commands bellow this will be executed in container's relative path "/app"
+# install simple http server for serving static content
+RUN npm install -g http-server
+
+# make the 'app' folder the current working directory
 WORKDIR /app
-
+# copy 'package.json' (if available)
 COPY package.json .
-
+# install project dependencies
 RUN npm install
 
-# COPY <source of app directory> <destination of directory in container>
+# copy <source of app directory> <destination of container directory>
 COPY . .
 
-# Exposed port by conector
-EXPOSE 8080
+# build app for production with minification
+RUN npm run build
 
-CMD ["npm", "run", "serve"]
+# expose port by conector
+EXPOSE 8080
+CMD [ "http-server", "dist" ]
