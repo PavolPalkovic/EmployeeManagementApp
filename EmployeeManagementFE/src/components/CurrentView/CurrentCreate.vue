@@ -54,7 +54,6 @@ export default {
         },
         createEmployee() {
             this.changeDateFormat();
-            console.log(this.employeeData.positionId);
             axios.post('http://localhost:1028/api/employees', this.employeeData)
                 .then(response => console.log(response))
                 .then(() => this.getEmployeesParent())
@@ -70,7 +69,7 @@ export default {
             this.employeeData.startingDate += "T00:00:00";
         },
         changePositionId(e) {
-            this.employeeData.positionId = e.target.value;
+            this.employeeData.positionId = parseInt(e.target.value);
         }
     }
 }

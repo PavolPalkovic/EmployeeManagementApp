@@ -63,7 +63,7 @@ export default {
                 .then(data =>{this.positionData = data})
         },
         changePositionId(e) {
-            this.employeeData.positionId = e.target.value;
+            this.employeeData.positionId = parseInt(e.target.value);
         }
     }
 }
