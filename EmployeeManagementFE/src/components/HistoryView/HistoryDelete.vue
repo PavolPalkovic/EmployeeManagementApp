@@ -1,29 +1,27 @@
 <template>
     <div class="backdrop" @click.self="close">
         <div class="delete">
-            <h4>Do you really want to delete employee: {{ firstName }} {{ lastName }}</h4>
-            <button @click="deleteHistoryEmployee(); close();">Yes</button>
+            <h4>Do you really want to delete employee: {{ employee.firstName }} {{ employee.lastName }}</h4>
+            <button @click="deleteEmployeeHistory(); close();">Yes</button>
             <button @click="close">Cancle</button>
         </div>
     </div>
 </template>
 
 <script>
-import axios from 'axios'
+import { deleteEmployeeHistory } from '../../requests/requestsHistory'
 
 export default {
-    props: ['id', 'firstName', 'lastName', 'getEmployeesHistoryParent'],
-    methods: {
-        close() {
-            this.$emit('closeDelete');
-        },
-        deleteHistoryEmployee() {
-            axios.delete('http://localhost:1028/api/employeesHistory/' + this.id)
-                .then(response => console.log(response))
-                .then(() => this.getEmployeesHistoryParent())
-                .catch(error => console.log(error))
-        }
+  props: ['employee', 'getEmployeesHistoryParent'],
+  methods: {
+    async deleteEmployeeHistory() {
+      await deleteEmployeeHistory(this.employee.id);
+      this.getEmployeesHistoryParent();
+    },
+    close() {
+      this.$emit('closeDelete');
     }
+  }
 }
 </script>
 

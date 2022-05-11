@@ -1,94 +1,78 @@
 <template>
-    <div class="backdrop" @click.self="close">
-        <div class="create">
-            <h4>*FirstName: <input type="text" v-model="employeeData.firstName"> </h4>
-            <h4>*LastName: <input type="text" v-model="employeeData.lastName"> </h4>
-            <h4>Address: <input type="text" v-model="employeeData.address"> </h4>
-            <h4>*Date Of Birth:
-                <input type="date" :max="new Date().toISOString().split('T')[0]" v-model="employeeData.dateOfBirth">
-            </h4>
-            <h4>*Position:
-            <select @change="changePositionId($event)" >
-                <option disabled selected value> -- select an option -- </option>
-                <option v-for="position in positionData" :key="position.id" :value="position.id">{{ position.name }}</option>
-            </select>
-            </h4>
-            <h4>*Starting Date:
-                <input type="date" :min="new Date().toISOString().split('T')[0]" v-model="employeeData.startingDate">
-            </h4>
-            <h4>*Salary: <input type="number" v-model="employeeData.salary"> €</h4>
-            <button @click="createEmployee(); close();"
-                    :disabled="!employeeData.firstName || !employeeData.lastName || 
-                    !employeeData.dateOfBirth || !employeeData.positionId ||
-                    !employeeData.startingDate || !employeeData.salary">Create</button>
-            <button @click="close">Cancle</button>
-        </div>
+  <div class="backdrop" @click.self="close">
+    <div class="create">
+      <h4>*FirstName: <input type="text" v-model="employee.firstName"> </h4>
+      <h4>*LastName: <input type="text" v-model="employee.lastName"> </h4>
+      <h4>Address: <input type="text" v-model="employee.address"> </h4>
+      <h4>*Date Of Birth:
+        <input type="date" :max="new Date().toISOString().split('T')[0]" v-model="employee.dateOfBirth">
+      </h4>
+      <h4>*Position:
+      <select @change="changePositionId($event)" >
+        <option disabled selected value> -- select an option -- </option>
+        <option v-for="position in positions" :key="position.id" :value="position.id">{{ position.name }}</option>
+      </select>
+      </h4>
+      <h4>*Starting Date:
+        <input type="date" :min="new Date().toISOString().split('T')[0]" v-model="employee.startingDate">
+      </h4>
+      <h4>*Salary: <input type="number" v-model="employee.salary"> €</h4>
+      <button @click="createEmployee(); close();"
+        :disabled="disableButton()">Create</button>
+      <button @click="close">Cancle</button>
     </div>
+  </div>
 </template>
 
 <script>
-import axios from 'axios'
+import { postEmployee } from "../../requests/requestsCurrent";
+import { getPositions } from "../../requests/requestsPosition";
 
 export default {
-    props: ['getEmployeesParent'],
-    data() {
-        return {
-            employeeData: {
-                firstName: '',
-                lastName: '',
-                address: '',
-                dateOfBirth: '',
-                positionId: null,
-                startingDate: '',
-                salary: ''
-            },
-            positionData: []
-        }
-    },
-    mounted() {
-        this.getPositionData();
-    },
-    methods: {
-        close() {
-            this.$emit('closeCreate');
-        },
-        createEmployee() {
-            this.changeDateFormat();
-            axios.post('http://localhost:1028/api/employees', this.employeeData)
-                .then(response => console.log(response))
-                .then(() => this.getEmployeesParent())
-                .catch(error => console.log(error))
-        },
-        getPositionData() {
-            fetch('http://localhost:1028/api/positions')
-                .then(response => response.json())
-                .then(data => {this.positionData = data})
-        },
-        changeDateFormat() {
-            this.employeeData.dateOfBirth += "T00:00:00";
-            this.employeeData.startingDate += "T00:00:00";
-        },
-        changePositionId(e) {
-            this.employeeData.positionId = parseInt(e.target.value);
-        }
+  props: ['getEmployeesParent'],
+  data() {
+    return {
+      employee: {},
+      positions: []
     }
+  },
+  async mounted() {
+    this.positions = await getPositions();
+  },
+  methods: {
+    async createEmployee() {
+      await postEmployee(this.employee);
+      this.getEmployeesParent();
+    },
+    close() {
+      this.$emit('closeCreate');
+    },
+    changePositionId(e) {
+      this.employee.positionId = parseInt(e.target.value);
+    },
+    disableButton() {
+      return (!this.employee.firstName || !this.employee.lastName || 
+        !this.employee.dateOfBirth || !this.employee.positionId ||
+        !this.employee.startingDate || !this.employee.salary)
+    }
+  } 
 }
 </script>
 
 
 <style scoped>
-    .create {
-        width: 400px;
-        padding: 20px;
-        margin: 100px auto;
-        background: white;
-        border-radius: 10px;
-    }
-    .backdrop {
-        top: 0;
-        position: fixed;
-        background: rgba(0,0,0,0.5);
-        width: 100%;
-        height: 100%;
-    }
+  .create {
+    width: 400px;
+    padding: 20px;
+    margin: 100px auto;
+    background: white;
+    border-radius: 10px;
+  }
+  .backdrop {
+    top: 0;
+    position: fixed;
+    background: rgba(0,0,0,0.5);
+    width: 100%;
+    height: 100%;
+  }
 </style>

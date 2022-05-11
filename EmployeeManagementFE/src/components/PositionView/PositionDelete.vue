@@ -1,7 +1,7 @@
 <template>
     <div class="backdrop" @click.self="close">
         <div class="delete">
-            <h4>Do you really want to delete position: {{ name }}</h4>
+            <h4>Do you really want to delete position: {{ position.name }}</h4>
             <button @click="deletePosition(); close();">Yes</button>
             <button @click="close">Cancle</button>
         </div>
@@ -9,19 +9,17 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { deletePosition } from '../../requests/requestsPosition'
 
 export default {
-    props: [ 'id', 'name', 'getPositionsParent' ],
+    props: [ 'position', 'getPositionsParent' ],
     methods: {
         close() {
             this.$emit('closeDelete');
         },
-        deletePosition() {
-            axios.delete('http://localhost:1028/api/positions/' + this.id)
-                .then(response => console.log(response))
-                .then(() => this.getPositionsParent())
-                .catch(error => console.log(error))
+        async deletePosition() {
+          await deletePosition(this.position.id)
+          this.getPositionsParent()
         }
     }
 }
